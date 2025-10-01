@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symbiotic Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a4d2e 0%, #1a7a4a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f6938 0%, #1a9850 100%);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            color: white;
+        }
+
+        .published-info {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            text-align: right;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .published-info div:first-child {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.95);
+            margin-top: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .home-screen {
+            text-align: center;
+        }
+
+        .home-screen h2 {
+            color: #0f6938;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #0f6938 0%, #1a9850 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(15, 105, 56, 0.4);
+        }
+
+        .quiz-screen {
+            display: none;
+        }
+
+        .question-header {
+            background: #f0f9f4;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #1a9850;
+        }
+
+        .question-number {
+            color: #0f6938;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            color: #333;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .option:hover:not(.disabled) {
+            background: #e8f5e9;
+            border-color: #1a9850;
+        }
+
+        .option.selected {
+            background: #c8e6c9;
+            border-color: #1a9850;
+        }
+
+        .option.correct {
+            background: #4caf50;
+            border-color: #2e7d32;
+            color: white;
+        }
+
+        .option.wrong {
+            background: #f44336;
+            border-color: #c62828;
+            color: white;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            background: #0f6938;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #1a9850;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .result-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .result-screen h2 {
+            color: #0f6938;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 48px;
+            color: #1a9850;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #0f6938 0%, #1a9850 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="published-info">
+                <div>Published by Michael_Donnn</div>
+                <div>September 30, 2025</div>
+            </div>
+            <h1>Symbiotic Quiz</h1>
+            <div class="tagline">Test Your Knowledge</div>
+        </div>
+
+        <div class="content">
+            <!-- Home Screen -->
+            <div class="home-screen" id="homeScreen">
+                <h2>How well do you know Symbiotic?</h2>
+                <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="quiz-screen" id="quizScreen">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Question 1 of 20</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="options" id="optionsContainer"></div>
+
+                <div class="navigation">
+                    <button class="nav-btn" id="prevBtn" onclick="previousQuestion()" disabled>Previous</button>
+                    <div class="progress" id="progress">1 / 20</div>
+                    <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div class="result-screen" id="resultScreen">
+                <h2>Quiz Complete!</h2>
+                <div class="score" id="finalScore"></div>
+                <div class="result-message" id="resultMessage"></div>
+                <button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What type of protocol is Symbiotic?",
+                options: ["Lending protocol", "Restaking protocol", "DEX protocol", "Oracle protocol"],
+                correct: 1
+            },
+            {
+                question: "What is the main purpose of Symbiotic?",
+                options: ["Token swapping", "Shared security infrastructure", "NFT marketplace", "Governance voting"],
+                correct: 1
+            },
+            {
+                question: "Which blockchain does Symbiotic primarily operate on?",
+                options: ["Bitcoin", "Ethereum", "Solana", "Cardano"],
+                correct: 1
+            },
+            {
+                question: "What can users stake in Symbiotic?",
+                options: ["Only ETH", "Various ERC-20 tokens", "NFTs", "Bitcoin"],
+                correct: 1
+            },
+            {
+                question: "What is a key feature of Symbiotic's architecture?",
+                options: ["Centralized control", "Modular design", "Fixed rewards", "No validators"],
+                correct: 1
+            },
+            {
+                question: "What does Symbiotic allow networks to do?",
+                options: ["Mine Bitcoin", "Bootstrap security", "Create NFTs", "Trade derivatives"],
+                correct: 1
+            },
+            {
+                question: "Which company is behind Symbiotic?",
+                options: ["Paradigm", "Lido", "Coinbase", "Binance"],
+                correct: 0
+            },
+            {
+                question: "What can operators do in Symbiotic?",
+                options: ["Only stake", "Run infrastructure for networks", "Trade tokens", "Mine blocks"],
+                correct: 1
+            },
+            {
+                question: "What is a vault in Symbiotic?",
+                options: ["Cold storage", "Delegation and reward distribution mechanism", "Trading account", "NFT collection"],
+                correct: 1
+            },
+            {
+                question: "Does Symbiotic support multiple assets?",
+                options: ["No, only ETH", "Yes, multiple ERC-20 tokens", "Only stablecoins", "Only governance tokens"],
+                correct: 1
+            },
+            {
+                question: "What type of security model does Symbiotic use?",
+                options: ["Proof of Work", "Shared security", "Proof of Authority", "No security"],
+                correct: 1
+            },
+            {
+                question: "Can Symbiotic work with Layer 2 solutions?",
+                options: ["No", "Yes", "Only Optimism", "Only Arbitrum"],
+                correct: 1
+            },
+            {
+                question: "What is the governance token of Symbiotic?",
+                options: ["SYM", "SYMB", "No token announced yet", "STAKE"],
+                correct: 2
+            },
+            {
+                question: "What makes Symbiotic different from EigenLayer?",
+                options: ["Nothing", "Multi-asset support and modularity", "Centralization", "No differences"],
+                correct: 1
+            },
+            {
+                question: "Who can become an operator in Symbiotic?",
+                options: ["Only large institutions", "Anyone meeting requirements", "Only validators", "No one"],
+                correct: 1
+            },
+            {
+                question: "What is the slashing mechanism in Symbiotic?",
+                options: ["No slashing", "Penalty for malicious behavior", "Automatic rewards", "Token burning"],
+                correct: 1
+            },
+            {
+                question: "Does Symbiotic support custom slashing conditions?",
+                options: ["No", "Yes", "Only default", "Not applicable"],
+                correct: 1
+            },
+            {
+                question: "What year was Symbiotic announced?",
+                options: ["2021", "2022", "2023", "2024"],
+                correct: 3
+            },
+            {
+                question: "Can users withdraw their staked assets anytime?",
+                options: ["Yes, instantly", "Subject to unbonding period", "Never", "Only on weekends"],
+                correct: 1
+            },
+            {
+                question: "What is the primary benefit for networks using Symbiotic?",
+                options: ["Free tokens", "Access to shared security", "Guaranteed profits", "No validators needed"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let questionLocked = [];
+
+        function startQuiz() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = q.question;
+            document.getElementById('progress').textContent = `${currentQuestion + 1} / ${questions.length}`;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((option, index) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = option;
+                div.onclick = () => selectOption(index);
+                
+                if (userAnswers[currentQuestion] !== undefined) {
+                    if (userAnswers[currentQuestion] === index) {
+                        div.classList.add('selected');
+                    }
+                    if (questionLocked[currentQuestion]) {
+                        div.classList.add('disabled');
+                        if (index === q.correct) {
+                            div.classList.add('correct');
+                        }
+                        if (userAnswers[currentQuestion] === index && index !== q.correct) {
+                            div.classList.add('wrong');
+                        }
+                    }
+                }
+                
+                optionsContainer.appendChild(div);
+            });
+
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+        }
+
+        function selectOption(index) {
+            if (questionLocked[currentQuestion]) {
+                return;
+            }
+
+            userAnswers[currentQuestion] = index;
+            const q = questions[currentQuestion];
+            
+            if (index !== q.correct) {
+                questionLocked[currentQuestion] = true;
+            } else {
+                if (!questionLocked[currentQuestion]) {
+                    score++;
+                    questionLocked[currentQuestion] = true;
+                }
+            }
+            
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+            
+            const percentage = (score / questions.length * 100).toFixed(0);
+            document.getElementById('finalScore').textContent = `${score} / ${questions.length}`;
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Outstanding! You\'re a Symbiotic expert! 🌟';
+            } else if (percentage >= 70) {
+                message = 'Great job! You know Symbiotic well! 💚';
+            } else if (percentage >= 50) {
+                message = 'Good effort! Keep learning about Symbiotic! 📚';
+            } else {
+                message = 'Keep studying! You\'ll master Symbiotic soon! 💪';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            questionLocked = [];
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('homeScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
